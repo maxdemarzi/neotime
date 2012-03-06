@@ -1,0 +1,73 @@
+body {
+  font: 10px sans-serif;
+  margin: 10px;
+}
+
+.exchange {
+  fill: #000;
+  opacity: .4;
+}
+
+.connection {
+  stroke: #ee5564;
+}
+
+.connection.incoming {
+  stroke: #4aaff2;
+}
+
+.party text {
+  fill: #999;
+}
+
+#case_name
+  text-transform: uppercase;
+
+
+.axis {
+  shape-rendering: crispEdges;
+}
+
+.exchange circle {
+  opacity: 0.5;
+}
+
+.x.axis line {
+  stroke: #666;
+}
+
+.x.axis path {
+  stroke: #666;
+}
+
+.x.axis .tick {
+  stroke: #666;
+}
+
+.x.axis .minor {
+  stroke-opacity: .5;
+}
+
+.x.axis path {
+  fill: none;
+}
+
+.y.axis line, .y.axis path {
+  stroke: #333;
+  fill: none;
+}
+
+text {
+  cursor: default;
+  pointer-events: none;
+}
+
+body {
+  background-color: #f5efe7;
+}
+
+#waiting {
+  top: 200px;
+  left: 50%;
+  position: absolute;
+}

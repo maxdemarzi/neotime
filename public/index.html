@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Neotime Visualization</title>
+    <script type="text/javascript" src="d3.min.js"></script>
+    <script type="text/javascript" src="d3.layout.min.js"></script>
+    <script type="text/javascript" src="d3.time.js"></script>
+    <script type="text/javascript" src="Timeliner.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="neotime.css"/>
+  </head>
+  <body>
+    <h1 id='case_title'>
+      Neotime Visualization
+    </h1>
+    <div id='chart'>
+      <div id='waiting'>
+        <img src='/spinner.gif'>
+      </div>
+      <script type="text/javascript" src="neotime.js"></script>
+    </div>
+    <script>
+      //<![CDATA[
+        function init(data) {
+          document.getElementById("waiting").style.visibility = "hidden";
+          cases = data.cases;
+          parties = data.parties;
+          new Timeliner().plot(cases, parties);
+        };
+        
+        d3.json("/timeline_data/tjuvholmen", init)
+      //]]>
+    </script>
+    <div>
+    	<h2>Credits</h2>
+    	<p>This project is based on the <a href="http://vis.bengler.no/projects/seeplan" target="_blank">Seeplan Series</a> created by <a href="http://vis.bengler.no/" target="_blank"> Even Westvang</a>.</p>
+    </div>
+  </body>
+</html>
