@@ -36,10 +36,10 @@ def create_graph
   commands = []
   names = []
   50.times do 
-    t = [generate_time, generate_time].sort
+    t = 10.times.collect{|x|generate_time}
     names << {:name => generate_text, 
-              :joined_at => t[0], 
-              :last_seen_at => t[1]}
+              :joined_at => t.min, 
+              :last_seen_at => t.max}
   end
       
   commands = names.map{ |n| [:create_node, n]}
@@ -47,7 +47,11 @@ def create_graph
   names.each_index do |from| 
     powerlaw.times do
       to = rand(50)
-      commands << create_rel(from,to, Time.local(names[to][:joined_at]), Time.local(names[to][:last_seen_at]))    
+      commands << create_rel(from,to, 
+                             [Time.local(names[to][:joined_at]),Time.local(names[from][:joined_at])].max, 
+                             [Time.local(names[to][:last_seen_at]), Time.local(names[from][:last_seen_at])].min 
+                             ) unless (Time.local(names[to][:joined_at]) > Time.local(names[from][:last_seen_at]) ||
+                                       Time.local(names[from][:joined_at]) > Time.local(names[to][:last_seen_at]) ) 
     end
   end
   batch_result = neo.batch *commands
