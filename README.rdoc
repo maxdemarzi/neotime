@@ -1,20 +1,20 @@
 === Description
 
-Uncover community structure by partitioning the links of a network, allowing for overlapping nodes.
+Visualize connections over time.
 
 === How To
 
-Follow along on {Chopping up a Karate Club}[http://wp.me/p26jdv-aa]
+Follow along on {Connections over Time}[http://wp.me/p26jdv-9b]
 
-  git clone git@github.com:maxdemarzi/kung_fu.git
-  cd kung_fu
+  git clone git@github.com:maxdemarzi/neotime.git
+  cd neotime
   bundle install
   rake neo4j:install
   rake neo4j:start
   rake neo4j:create
   rackup
   
-Then visit http://localhost:9292/index.html to see the examples.
+Then visit http://localhost:9292/index.html to see the visualization.
 
 See an example running on heroku at {}[]
 
@@ -23,3 +23,4 @@ See an example running on heroku at {}[]
 * {Neo4j Community}[http://neo4j.org]
 * {D3.js}[http://mbostock.github.com/d3/]
 * {Max De Marzi}[http://maxdemarzi.com]
+* {Even Westvang}[http://vis.bengler.no/]
