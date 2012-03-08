@@ -7,7 +7,7 @@
     Timeliner.prototype.plot = function(cases, parties) {
       var h, w;
       w = 1200;
-      h = 900;
+      h = 700;
       this.highlightColor = "#fff";
       this.partyUnselectedColor = "#dcd6cd";
       this.caseUnselectedColor = "#aaa";
@@ -78,8 +78,8 @@
     Timeliner.prototype.plotCases = function(cases) {
       var barHeight, e, exchanges, h, m, parse, self, timelines, w, x, xAxis, y;
       m = [0, 00, 00, 40];
-      w = 1100 - m[1] - m[3];
-      h = 900 - m[0] - m[2];
+      w = 900 - m[1] - m[3];
+      h = 200 - m[0] - m[2];
       parse = d3.time.format("%Y-%m-%d").parse;
       e = cases.length;
       x = d3.time.scale().range([0, w]);
@@ -128,9 +128,9 @@
     };
     Timeliner.prototype.plotParties = function(parties) {
       var bubble, bubbles, color, format, h, hOffset, node, self, w, wOffset;
-      w = 600;
+      w = 500;
       h = 600;
-      hOffset = 280;
+      hOffset = 100;
       wOffset = 00;
       format = d3.format(",d");
       color = d3.interpolateRgb("#eee", this.highlightColor);
@@ -161,7 +161,7 @@
       }).delay(function(d, i) {
         return i * 3;
       });
-      return node.append("svg:text").attr("text-anchor", "middle").attr("dy", ".3em").attr("font-size", ".8em").text(function(d) {
+      return node.append("svg:text").attr("text-anchor", "middle").attr("dy", ".3em").attr("font-size", "1em").text(function(d) {
         return d.name.substring(0, d.r / 2.5);
       });
     };

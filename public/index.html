@@ -20,18 +20,6 @@
       </div>
       <script type="text/javascript" src="neotime.js"></script>
     </div>
-    <script>
-      //<![CDATA[
-        function init(data) {
-          document.getElementById("waiting").style.visibility = "hidden";
-          cases = data.cases;
-          parties = data.parties;
-          new Timeliner().plot(cases, parties);
-        };
-        
-        d3.json("/timeline_data/tjuvholmen", init)
-      //]]>
-    </script>
     <div>
     	<h2>Credits</h2>
     	<p>This project is based on the <a href="http://vis.bengler.no/projects/seeplan" target="_blank">Seeplan Series</a> created by <a href="http://vis.bengler.no/" target="_blank"> Even Westvang</a>.</p>

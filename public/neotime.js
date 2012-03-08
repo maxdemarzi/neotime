@@ -5,4 +5,4 @@ function init(data) {
   new Timeliner().plot(cases, parties);
 };
 
-d3.json("/sampledata.json", init)
+d3.json("/communication", init)

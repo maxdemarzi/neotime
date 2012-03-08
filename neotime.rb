@@ -3,17 +3,21 @@ require 'neography'
 require 'sinatra'
 require 'uri'
 
-def generate_time(from = Time.local(2000, 1, 1), to = Time.now)
+def generate_time(from = Time.local(2004, 1, 1), to = Time.now)
   Time.at(from + rand * (to.to_f - from.to_f)).strftime('%Y-%m-%d')
 end
 
-def powerlaw(min=1,max=500,n=10)
-    max += 1
-    pl = ((max**(n+1) - min**(n+1))*rand() + min**(n+1))**(1.0/(n+1))
-    (max-1-pl.to_i)+min
+def time_offset(n)
+    Time.local(2004, 1, 1) + ((60*60*24*58) * n)
 end
 
-def create_rel(from,to,start_date,end_date)
+def powerlaw(min=1,max=500,n=20,o=0.05)
+    max += 1
+    pl = ((max**(n+1) - min**(n+1))*rand() + min**(n+1))**(1.0/(n+1))
+    rand > o ? (max-1-pl.to_i)+min : rand(max).to_i
+end
+
+def create_rel(from,to,start_date, end_date)
   [:create_relationship, "wrote", "{#{from}}", "{#{to}}", {:date => generate_time(start_date,end_date)}]
 end
 
@@ -28,25 +32,13 @@ def create_graph
              James Jason Jeff Jennifer Jim Jon Joe John Jonathan Justin 
              Kim Kiril LeRoy Lester Mark Max Maykel Michael Musannif Neil]
 
-#  commands = names.map{ |n| [:create_node, {"name" => n}]}
+  commands = names.map{ |n| [:create_node, {"name" => n}]}
 
-  names.each do |n| 
-    t = 10.times.collect{|x|generate_time}
-    commands << [:create_node, {:name => n, 
-                                :joined_at => t.min, 
-                                :last_seen_at => t.max}]
-  end
-      
-  
   names.each_index do |from|
     commands << [:add_node_to_index, "nodes_index", "type", "user", "{#{from}}"]  
     powerlaw.times do
       to = rand(50)
-      commands << create_rel(from,to, 
-                             [Time.local(commands[to][1][:joined_at]),Time.local(commands[from][1][:joined_at])].max, 
-                             [Time.local(commands[to][1][:last_seen_at]), Time.local(commands[from][1][:last_seen_at])].min 
-                             ) unless (Time.local(commands[to][1][:joined_at]) > Time.local(commands[from][1][:last_seen_at]) ||
-                                       Time.local(commands[from][1][:joined_at]) > Time.local(commands[to][1][:last_seen_at]) ) 
+      commands << create_rel(from,to,time_offset([from,to].max),Time.now) 
     end
   end
   batch_result = neo.batch *commands
@@ -57,15 +49,16 @@ def get_parties
   cypher_query =  " START me = node:nodes_index(type = 'user')"
   cypher_query << " MATCH (me)-[r?:wrote]-()"
   cypher_query << " RETURN ID(me), me.name, count(r), min(r.date), max(r.date)"
+  cypher_query << " ORDER BY ID(me)"
   neo.execute_query(cypher_query)["data"]
 end
 
-
-def get_incomming_matrix
+def get_incoming_matrix
   neo = Neography::Rest.new
   cypher_query =  " START me = node:nodes_index(type = 'user')"
   cypher_query << " MATCH (me)<-[r?:wrote]-(friends)"
-  cypher_query << " RETURN ID(me), me.name, r.date, ID(friends)"
+  cypher_query << " RETURN ID(me), me.name, collect(ID(friends)), collect(r.date)"
+  cypher_query << " ORDER BY ID(me)"
   neo.execute_query(cypher_query)["data"]
 end
 
@@ -73,20 +66,34 @@ def get_outgoing_matrix
   neo = Neography::Rest.new
   cypher_query =  " START me = node:nodes_index(type = 'user')"
   cypher_query << " MATCH (me)-[r?:wrote]->(friends)"
-  cypher_query << " RETURN ID(me), me.name, r.date, ID(friends)"
+  cypher_query << " RETURN ID(me), me.name, collect(ID(friends)), collect(r.date)"
+  cypher_query << " ORDER BY ID(me)"
   neo.execute_query(cypher_query)["data"]
 end
 
-
 get '/communication' do
-require 'net-http-spy'
-# Net::HTTP.http_logger_options = {:body => true}    # just the body
-Net::HTTP.http_logger_options = {:verbose => true} # see everything
   p = get_parties
-  parties = p.map{|p| {"id" => p[0], "name" => p[1], "value" =>p[4]} }
-  p.to_json
+  parties = p.map{|p| {"id" => p[0], "name" => p[1], "value" =>p[2]} }
+  parties.to_json
+  cases = p.map{|p| {"title" => p[1], "initiated_at" => p[3], "last_correspondance_at" =>p[4], "exchanges" => []} }
+  cases.to_json
   
-  #i = get_incomming_matrix
-  #i.to_json
-#  communication_matrix.map{|cm| {"name" => fm[0], "follows" => fm[1][1..(fm[1].size - 2)].split(", ")} }.to_json
+  gim = get_incoming_matrix
+  gim.each_index do |im|
+    sors = gim[im][2][1..(gim[im][2].size - 2)].split(", ")
+    jds  = gim[im][3][1..(gim[im][3].size - 2)].split(", ")
+    sors.size.times do |t|
+      cases[im]["exchanges"] <<  {"incoming" => true, "sender_or_recipent" => sors[t], "journal_date" => jds[t]}  
+    end
+  end
+
+  gom = get_outgoing_matrix
+  gom.each_index do |om|
+    sors = gom[om][2][1..(gom[om][2].size - 2)].split(", ")
+    jds  = gom[om][3][1..(gom[om][3].size - 2)].split(", ")
+    sors.size.times do |t|
+      cases[om]["exchanges"] <<  {"incoming" => false, "sender_or_recipent" => sors[t], "journal_date" => jds[t]}  
+    end
+  end
+  {:cases => cases, :parties => parties}.to_json
 end
