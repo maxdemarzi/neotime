@@ -74,9 +74,7 @@ end
 get '/communication' do
   p = get_parties
   parties = p.map{|p| {"id" => p[0], "name" => p[1], "value" =>p[2]} }
-  parties.to_json
   cases = p.map{|p| {"title" => p[1], "initiated_at" => p[3], "last_correspondance_at" =>p[4], "exchanges" => []} }
-  cases.to_json
   
   gim = get_incoming_matrix
   gim.each_index do |im|
