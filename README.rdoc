@@ -16,7 +16,7 @@ Follow along on {Connections over Time}[http://wp.me/p26jdv-9b]
   
 Then visit http://localhost:9292/index.html to see the visualization.
 
-See an example running on heroku at {}[]
+See an example running on heroku at http://neotime.herokuapp.com/index.html
 
 === Links
 
